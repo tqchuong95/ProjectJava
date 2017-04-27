@@ -5,6 +5,9 @@
  */
 package projectjava.gui;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+
 /**
  *
  * @author UITCV
@@ -16,8 +19,10 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     public GUIFrame() {
         initComponents();
-        buttonGroup1.add(jRadioButton1);
+        buttonGroup1.add(radioCategory);
         buttonGroup1.add(jRadioButton2);
+        cbxFirst.setVisible(false);
+        cbxSecond.setVisible(false);
     }
 
     /**
@@ -30,11 +35,11 @@ public class GUIFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        radioCategory = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        cbxFind = new javax.swing.JComboBox<>();
+        cbxFirst = new javax.swing.JComboBox<>();
+        cbxSecond = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
@@ -47,24 +52,30 @@ public class GUIFrame extends javax.swing.JFrame {
         setTitle("Tra cứu thông tin UIT");
         setPreferredSize(new java.awt.Dimension(534, 584));
 
-        jRadioButton1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jRadioButton1.setText("Theo danh mục");
+        radioCategory.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        radioCategory.setSelected(true);
+        radioCategory.setText("Theo danh mục");
 
         jRadioButton2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jRadioButton2.setText("Nhập từ khóa");
 
-        jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm", "Môn học", "Giảng viên", "Thông tin Quy chế" }));
+        cbxFind.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cbxFind.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm", "Môn học", "Giảng viên", "Thông tin Quy chế" }));
+        cbxFind.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxFindActionPerformed(evt);
+            }
+        });
 
-        jComboBox2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ nhất", "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxFirst.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cbxFirst.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ nhất", "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jComboBox3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ hai", "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxSecond.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cbxSecond.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ hai", "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jList1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -104,13 +115,13 @@ public class GUIFrame extends javax.swing.JFrame {
                             .addComponent(jScrollPane2)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cbxFind, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jRadioButton1)
+                                        .addComponent(radioCategory)
                                         .addGap(48, 48, 48)
                                         .addComponent(jRadioButton2))
-                                    .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(cbxFirst, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cbxSecond, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(jScrollPane1))
                         .addContainerGap())
@@ -122,14 +133,14 @@ public class GUIFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
+                    .addComponent(radioCategory)
                     .addComponent(jRadioButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxFind, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxFirst, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxSecond, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -145,6 +156,35 @@ public class GUIFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cbxFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxFindActionPerformed
+                    // TODO add your handling code here:
+        if(cbxFind.getSelectedIndex()==0)
+        {
+            cbxFirst.setVisible(false);
+        }
+        if(cbxFind.getSelectedIndex()==1)
+        {
+            cbxFirst.setVisible(true);
+                String [] items = new String[10];
+                items[0] = "Chọn khoa";
+                items[1] = "Khoa Công nghệ phần mềm";
+                items[2] = "Khoa Khoa học kĩ thuật";
+                items[3] = "Khoa Hệ thống thông tin";
+                items[4] = "Khoa Khoa học máy tính";
+                items[5] = "Khoa Mạng máy tính và truyền thông";
+                ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
+                cbxFirst.setModel(cbxModel);    
+        }
+        if(cbxFind.getSelectedIndex()==2)
+        {
+            cbxFirst.setVisible(false);
+        }
+        if(cbxFind.getSelectedIndex()==3)
+        {
+            cbxFirst.setVisible(false);
+        }
+    }//GEN-LAST:event_cbxFindActionPerformed
 
     /**
      * @param args the command line arguments
@@ -183,17 +223,17 @@ public class GUIFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JComboBox<String> cbxFind;
+    private javax.swing.JComboBox<String> cbxFirst;
+    private javax.swing.JComboBox<String> cbxSecond;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
-    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JRadioButton radioCategory;
     // End of variables declaration//GEN-END:variables
 }
