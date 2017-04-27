@@ -28,8 +28,8 @@ public class DBConnectionService {
     public static Connection getConnection()throws Exception{
         Connection connect = null;
         dbUserName = "sa";
-        dbPassword = "123456";
-        dbURL = "jdbc:sqlserver://localhost;databaseName=TestJDBC;user="+dbUserName+";password="+dbPassword+";";
+        dbPassword = "sa";
+        dbURL = "jdbc:sqlserver://localhost;databaseName=CSDL_TRACUUTHONGTIN;user=sa;password=sa";
         if(connect == null){
             loadJDBCDDriver();
             try{

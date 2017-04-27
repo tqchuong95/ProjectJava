@@ -5,8 +5,18 @@
  */
 package projectjava.gui;
 
+import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.DefaultTableModel;
+import projectjava.dbconnection.DBConnectionService;
+
 
 /**
  *
@@ -17,12 +27,21 @@ public class GUIFrame extends javax.swing.JFrame {
     /**
      * Creates new form GUIFrame
      */
+    private Connection connect;
+    private ResultSet rs;
+    private PreparedStatement stmt;
     public GUIFrame() {
+        
         initComponents();
         buttonGroup1.add(radioCategory);
         buttonGroup1.add(jRadioButton2);
         cbxFirst.setVisible(false);
         cbxSecond.setVisible(false);
+        try {
+            connect = DBConnectionService.getConnection(); 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -163,22 +182,21 @@ public class GUIFrame extends javax.swing.JFrame {
         {
             cbxFirst.setVisible(false);
         }
-        if(cbxFind.getSelectedIndex()==1)
-        {
-            cbxFirst.setVisible(true);
-                String [] items = new String[10];
-                items[0] = "Chọn khoa";
-                items[1] = "Khoa Công nghệ phần mềm";
-                items[2] = "Khoa Khoa học kĩ thuật";
-                items[3] = "Khoa Hệ thống thông tin";
-                items[4] = "Khoa Khoa học máy tính";
-                items[5] = "Khoa Mạng máy tính và truyền thông";
-                ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
-                cbxFirst.setModel(cbxModel);    
-        }
         if(cbxFind.getSelectedIndex()==2)
         {
-            cbxFirst.setVisible(false);
+                    cbxFirst.setVisible(true);
+                    String [] items = new String[10];
+                    items[0] = "Chọn khoa";
+                    items[1] = "Khoa Công nghệ phần mềm";
+                    items[2] = "Khoa Khoa học kĩ thuật";
+                    items[3] = "Khoa Hệ thống thông tin";
+                    items[4] = "Khoa Khoa học máy tính";
+                    items[5] = "Khoa Mạng máy tính và truyền thông";
+                    ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
+                    cbxFirst.setModel(cbxModel);    
+        }
+        if(cbxFind.getSelectedIndex()==1)
+        {
         }
         if(cbxFind.getSelectedIndex()==3)
         {
