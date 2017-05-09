@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 import projectjava.dbconnection.DBConnectionService;
 
@@ -60,7 +61,7 @@ public class GUIFrame extends javax.swing.JFrame {
         cbxFirst = new javax.swing.JComboBox<>();
         cbxSecond = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        listQuestion = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -92,13 +93,13 @@ public class GUIFrame extends javax.swing.JFrame {
         cbxSecond.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cbxSecond.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ hai", "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jList1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        listQuestion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        listQuestion.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(listQuestion);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setText("Danh sách câu hỏi");
@@ -197,6 +198,35 @@ public class GUIFrame extends javax.swing.JFrame {
         }
         if(cbxFind.getSelectedIndex()==1)
         {
+            cbxFirst.setVisible(false);
+            String s = "select * from MON_HOC";
+            try {
+                stmt = connect.prepareStatement(s);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                rs = stmt.executeQuery();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            try {
+                String [] items = new String[150];
+                while(rs.next())
+                {
+                    for(int i=0; i<5; i++)
+                    {
+                        items[i]= rs.getString("CAUHOI"); 
+                    }
+                }
+                ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
+                listQuestion.getModel().addListDataListener((ListDataListener) cbxModel);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
+           
         }
         if(cbxFind.getSelectedIndex()==3)
         {
@@ -247,11 +277,11 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JList<String> listQuestion;
     private javax.swing.JRadioButton radioCategory;
     // End of variables declaration//GEN-END:variables
 }
