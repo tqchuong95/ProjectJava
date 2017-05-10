@@ -5,6 +5,19 @@
  */
 package projectjava.gui;
 
+import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
+import projectjava.dbconnection.DBConnectionService;
+
+
 /**
  *
  * @author UITCV
@@ -14,10 +27,21 @@ public class GUIFrame extends javax.swing.JFrame {
     /**
      * Creates new form GUIFrame
      */
+    private Connection connect;
+    private ResultSet rs;
+    private PreparedStatement stmt;
     public GUIFrame() {
+        
         initComponents();
-        buttonGroup1.add(jRadioButton1);
+        buttonGroup1.add(radioCategory);
         buttonGroup1.add(jRadioButton2);
+        cbxFirst.setVisible(false);
+        cbxSecond.setVisible(false);
+        try {
+            connect = DBConnectionService.getConnection(); 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -30,55 +54,62 @@ public class GUIFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        radioCategory = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        cbxFind = new javax.swing.JComboBox<>();
+        cbxFirst = new javax.swing.JComboBox<>();
+        cbxSecond = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        listQuestion = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        Search = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        Answers = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tra cứu thông tin UIT");
         setPreferredSize(new java.awt.Dimension(534, 584));
 
-        jRadioButton1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jRadioButton1.setText("Theo danh mục");
+        radioCategory.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        radioCategory.setSelected(true);
+        radioCategory.setText("Theo danh mục");
 
         jRadioButton2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jRadioButton2.setText("Nhập từ khóa");
 
-        jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm", "Môn học", "Giảng viên", "Thông tin Quy chế" }));
-
-        jComboBox2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ nhất", "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jComboBox3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mục con thứ hai", "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jList1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        cbxFind.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cbxFind.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm", "Môn học", "Giảng viên", "Thông tin Quy chế" }));
+        cbxFind.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxFindActionPerformed(evt);
+            }
         });
-        jScrollPane1.setViewportView(jList1);
+
+        cbxFirst.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cbxFirst.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm" }));
+
+        cbxSecond.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        cbxSecond.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm" }));
+
+        listQuestion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jScrollPane1.setViewportView(listQuestion);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setText("Danh sách câu hỏi");
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jButton1.setText("Tìm kiếm");
+        Search.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        Search.setText("Tìm kiếm");
+        Search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SearchActionPerformed(evt);
+            }
+        });
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane2.setViewportView(jTextArea1);
+        Answers.setEditable(false);
+        Answers.setColumns(20);
+        Answers.setRows(5);
+        jScrollPane2.setViewportView(Answers);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setText("Câu trả lời");
@@ -97,20 +128,20 @@ public class GUIFrame extends javax.swing.JFrame {
                                 .addComponent(jLabel1)
                                 .addGap(194, 194, 194))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton1)
+                                .addComponent(Search)
                                 .addContainerGap())))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane2)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cbxFind, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jRadioButton1)
+                                        .addComponent(radioCategory)
                                         .addGap(48, 48, 48)
                                         .addComponent(jRadioButton2))
-                                    .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(cbxFirst, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cbxSecond, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(jScrollPane1))
                         .addContainerGap())
@@ -122,20 +153,20 @@ public class GUIFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
+                    .addComponent(radioCategory)
                     .addComponent(jRadioButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxFind, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxFirst, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbxSecond, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(Search)
                 .addGap(3, 3, 3)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -145,6 +176,110 @@ public class GUIFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cbxFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxFindActionPerformed
+        // TODO add your handling code here:
+        //Không chọn gì hết            
+        if(cbxFind.getSelectedIndex()==0)
+        {
+            cbxFirst.setVisible(false);
+        }
+        //Chọn giảng viên
+        if(cbxFind.getSelectedIndex()==2)
+        {
+                    cbxFirst.setVisible(true);
+                    String [] items = new String[10];
+                    items[0] = "Chọn khoa, bộ môn";
+                    items[1] = "Khoa Công nghệ phần mềm";
+                    items[2] = "Bộ môn Khoa học và kĩ thuật thông tin";
+                    items[3] = "Khoa Hệ thống thông tin";
+                    items[4] = "Khoa Khoa học máy tính";
+                    items[5] = "Khoa Mạng máy tính và truyền thông";
+                    ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
+                    cbxFirst.setModel(cbxModel);    
+        }
+        //Chọn môn học
+        if(cbxFind.getSelectedIndex()==1)
+        {
+            cbxFirst.setVisible(false);
+            String s = "SELECT * FROM [Java].[dbo].[MON_HOC]";
+            try {
+                stmt = connect.prepareStatement(s);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                rs = stmt.executeQuery();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            try {
+                DefaultListModel<String> model = new DefaultListModel<>();
+                while(rs.next())
+                {
+                    model.addElement(rs.getString("CAUHOI"));
+                }
+                listQuestion.setModel(model);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
+           
+        }
+        //Chọn Thông tin quy chế
+        if(cbxFind.getSelectedIndex()==3)
+        {
+            cbxFirst.setVisible(false);
+            String s = "SELECT * FROM [Java].[dbo].[THONGTIN_QUYCHE]";
+            try {
+                stmt = connect.prepareStatement(s);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                rs = stmt.executeQuery();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            try {
+                DefaultListModel<String> model = new DefaultListModel<>();
+                while(rs.next())
+                {
+                    model.addElement(rs.getString("CAUHOI"));
+                }
+                listQuestion.setModel(model);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_cbxFindActionPerformed
+
+    private void SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchActionPerformed
+        // TODO add your handling code here:
+        if(cbxFind.getSelectedIndex()==1)
+        {
+            DefaultTableModel tableModel = new DefaultTableModel();
+            String []colsName = {"CAUHOI", "TRALOI"};
+            tableModel.setColumnIdentifiers(colsName);
+            try {
+                String row[] = new String[2];
+                while(rs.next()){
+                row[0]=rs.getString("CAUHOI");
+                row[1]=rs.getString("TRALOI");
+                tableModel.addRow(row);
+                }
+                if(evt.getSource()==Search ){
+                    Answers.setText(row[1]);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+    }//GEN-LAST:event_SearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -182,18 +317,18 @@ public class GUIFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea Answers;
+    private javax.swing.JButton Search;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
+    private javax.swing.JComboBox<String> cbxFind;
+    private javax.swing.JComboBox<String> cbxFirst;
+    private javax.swing.JComboBox<String> cbxSecond;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList<String> jList1;
-    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JList<String> listQuestion;
+    private javax.swing.JRadioButton radioCategory;
     // End of variables declaration//GEN-END:variables
 }
