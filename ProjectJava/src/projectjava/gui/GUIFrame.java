@@ -5,16 +5,20 @@
  */
 package projectjava.gui;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import projectjava.dbconnection.DBConnectionService;
 
 
@@ -30,20 +34,53 @@ public class GUIFrame extends javax.swing.JFrame {
     private Connection connect;
     private ResultSet rs;
     private PreparedStatement stmt;
+    DefaultListModel<String> listModel;
+    DefaultListModel<String> listModelAns;
+    DefaultListModel<String> listModelIma;
     public GUIFrame() {
-        
         initComponents();
         buttonGroup1.add(radioCategory);
-        buttonGroup1.add(jRadioButton2);
+        buttonGroup1.add(rbKey);
         cbxFirst.setVisible(false);
-        cbxSecond.setVisible(false);
+        //cbxSecond.setVisible(false);
+        txtFKey.setVisible(false);
         try {
             connect = DBConnectionService.getConnection(); 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
-
+    
+    public void HinhAnh(String str) {
+        lbImage.setIcon(null);
+        if(str!=null){
+            BufferedImage image = null;
+            try {
+                image = ImageIO.read(new File(str));
+            } catch (IOException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            int x = lbImage.getSize().width;
+            int y = lbImage.getSize().height;
+            int ix = image.getWidth();
+            int iy = image.getHeight();
+            int dx = 0;
+            int dy = 0;
+            if(x / y > ix / iy) {
+                dy = y;
+                dx = dy * ix / iy;
+            } else {
+                dx = x;
+                dy = dx * iy / ix;
+            }
+            ImageIcon icon = new ImageIcon(image.getScaledInstance(dx, dy, Image.SCALE_SMOOTH));
+            lbImage.setIcon(icon);
+        }
+        else{
+            lbImage.setText("No image");
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -55,10 +92,9 @@ public class GUIFrame extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         radioCategory = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        rbKey = new javax.swing.JRadioButton();
         cbxFind = new javax.swing.JComboBox<>();
         cbxFirst = new javax.swing.JComboBox<>();
-        cbxSecond = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         listQuestion = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
@@ -66,17 +102,31 @@ public class GUIFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         Answers = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
+        lbImage = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txtFKey = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tra cứu thông tin UIT");
         setPreferredSize(new java.awt.Dimension(534, 584));
+        setResizable(false);
 
         radioCategory.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         radioCategory.setSelected(true);
         radioCategory.setText("Theo danh mục");
+        radioCategory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioCategoryActionPerformed(evt);
+            }
+        });
 
-        jRadioButton2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jRadioButton2.setText("Nhập từ khóa");
+        rbKey.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        rbKey.setText("Nhập từ khóa");
+        rbKey.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbKeyActionPerformed(evt);
+            }
+        });
 
         cbxFind.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cbxFind.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm", "Môn học", "Giảng viên", "Thông tin Quy chế" }));
@@ -88,9 +138,6 @@ public class GUIFrame extends javax.swing.JFrame {
 
         cbxFirst.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         cbxFirst.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm" }));
-
-        cbxSecond.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        cbxSecond.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn mục tìm kiếm" }));
 
         listQuestion.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jScrollPane1.setViewportView(listQuestion);
@@ -108,70 +155,96 @@ public class GUIFrame extends javax.swing.JFrame {
 
         Answers.setEditable(false);
         Answers.setColumns(20);
+        Answers.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        Answers.setLineWrap(true);
         Answers.setRows(5);
+        Answers.setWrapStyleWord(true);
         jScrollPane2.setViewportView(Answers);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setText("Câu trả lời");
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel3.setText("Hình ảnh và Sách");
+
+        txtFKey.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtFKey.setText("Vui lòng nhập từ khóa");
+        txtFKey.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtFKeyMouseClicked(evt);
+            }
+        });
+        txtFKey.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtFKeyKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtFKeyKeyReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(203, 203, 203))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 206, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(194, 194, 194))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(Search)
-                                .addContainerGap())))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(cbxFind, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(radioCategory)
-                                        .addGap(48, 48, 48)
-                                        .addComponent(jRadioButton2))
-                                    .addComponent(cbxFirst, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cbxSecond, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jScrollPane1))
-                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel3))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 427, Short.MAX_VALUE)
+                        .addComponent(Search))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane2)
+                        .addGap(8, 8, 8)
+                        .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(radioCategory)
+                                .addGap(48, 48, 48)
+                                .addComponent(rbKey))
+                            .addComponent(cbxFirst, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cbxFind, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtFKey, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioCategory)
-                    .addComponent(jRadioButton2))
+                    .addComponent(rbKey))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtFKey, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxFind, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxFirst, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cbxSecond, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(14, 14, 14)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Search)
                 .addGap(3, 3, 3)
-                .addComponent(jLabel2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 11, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 8, Short.MAX_VALUE))
         );
 
         pack();
@@ -179,42 +252,53 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void cbxFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxFindActionPerformed
         // TODO add your handling code here:
-        //Không chọn gì hết            
+        Answers.setText("");
+        this.HinhAnh(null);
+        //Không chọn gì hết   
         if(cbxFind.getSelectedIndex()==0)
         {
             cbxFirst.setVisible(false);
+            this.HinhAnh(null);
+            DefaultListModel<String> model = new DefaultListModel<>();
+            model.addElement("");
+            listQuestion.setModel(model);
         }
         //Chọn giảng viên
         if(cbxFind.getSelectedIndex()==2)
         {
-                    cbxFirst.setVisible(true);
-                    String [] items = new String[10];
-                    items[0] = "Chọn khoa, bộ môn";
-                    items[1] = "Khoa Công nghệ phần mềm";
-                    items[2] = "Bộ môn Khoa học và kĩ thuật thông tin";
-                    items[3] = "Khoa Hệ thống thông tin";
-                    items[4] = "Khoa Khoa học máy tính";
-                    items[5] = "Khoa Mạng máy tính và truyền thông";
-                    ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
-                    cbxFirst.setModel(cbxModel);    
+            cbxFirst.setVisible(false);
+            String s = "SELECT * FROM GIANG_VIEN";
+            try {
+                stmt = connect.prepareStatement(s);
+                rs = stmt.executeQuery();
+                DefaultListModel<String> model = new DefaultListModel<>();
+                while(rs.next())
+                {
+                    model.addElement(rs.getString("CAUHOI"));
+                }
+                listQuestion.setModel(model);
+            } catch (SQLException ex) {
+                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+//                    cbxFirst.setVisible(true);
+//                    String [] items = new String[10];
+//                    items[0] = "Chọn khoa, bộ môn";
+//                    items[1] = "Khoa Công nghệ phần mềm";
+//                    items[2] = "Bộ môn Khoa học và kĩ thuật thông tin";
+//                    items[3] = "Khoa Hệ thống thông tin";
+//                    items[4] = "Khoa Khoa học máy tính";
+//                    items[5] = "Khoa Mạng máy tính và truyền thông";
+//                    ComboBoxModel cbxModel =  new DefaultComboBoxModel(items);
+//                    cbxFirst.setModel(cbxModel);    
         }
         //Chọn môn học
         if(cbxFind.getSelectedIndex()==1)
         {
             cbxFirst.setVisible(false);
-            String s = "SELECT * FROM [Java].[dbo].[MON_HOC]";
+            String s = "SELECT * FROM MON_HOC";
             try {
                 stmt = connect.prepareStatement(s);
-            } catch (SQLException ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
                 rs = stmt.executeQuery();
-            } catch (SQLException ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            try {
                 DefaultListModel<String> model = new DefaultListModel<>();
                 while(rs.next())
                 {
@@ -224,26 +308,15 @@ public class GUIFrame extends javax.swing.JFrame {
             } catch (SQLException ex) {
                 Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-           
-           
         }
         //Chọn Thông tin quy chế
         if(cbxFind.getSelectedIndex()==3)
         {
             cbxFirst.setVisible(false);
-            String s = "SELECT * FROM [Java].[dbo].[THONGTIN_QUYCHE]";
+            String s = "SELECT * FROM THONGTIN_QUYCHE";
             try {
                 stmt = connect.prepareStatement(s);
-            } catch (SQLException ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
                 rs = stmt.executeQuery();
-            } catch (SQLException ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            try {
                 DefaultListModel<String> model = new DefaultListModel<>();
                 while(rs.next())
                 {
@@ -254,33 +327,210 @@ public class GUIFrame extends javax.swing.JFrame {
                 Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
     }//GEN-LAST:event_cbxFindActionPerformed
 
     private void SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchActionPerformed
-        // TODO add your handling code here:
-        if(cbxFind.getSelectedIndex()==1)
-        {
-            DefaultTableModel tableModel = new DefaultTableModel();
-            String []colsName = {"CAUHOI", "TRALOI"};
-            tableModel.setColumnIdentifiers(colsName);
-            try {
-                String row[] = new String[2];
-                while(rs.next()){
-                row[0]=rs.getString("CAUHOI");
-                row[1]=rs.getString("TRALOI");
-                tableModel.addRow(row);
+        // TODO add your handling code here
+        if(radioCategory.isSelected()){
+            if(cbxFind.getSelectedIndex()==1)
+            {
+                cbxFirst.setVisible(false);
+                String s = "SELECT * FROM MON_HOC";
+                try {
+                    stmt = connect.prepareStatement(s);
+                    rs = stmt.executeQuery();
+                    DefaultListModel<String> model = new DefaultListModel<>();
+                    DefaultListModel<String> modelim = new DefaultListModel<>();
+                    while(rs.next())
+                    {
+                        model.addElement(rs.getString("TRALOI"));
+                        modelim.addElement(rs.getString("HINHANH"));
+                    }
+                    for(int i=0; i<model.getSize(); i++){
+                        if(listQuestion.getSelectedIndex()==i){
+                            Answers.setText(model.get(i));
+                            this.HinhAnh(modelim.get(i));
+                        }
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                if(evt.getSource()==Search ){
-                    Answers.setText(row[1]);
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+            if(cbxFind.getSelectedIndex()==2){
+                cbxFirst.setVisible(false);
+                String s = "SELECT * FROM GIANG_VIEN";
+                try {
+                    stmt = connect.prepareStatement(s);
+                    rs = stmt.executeQuery();
+                    DefaultListModel<String> model = new DefaultListModel<>();
+                    DefaultListModel<String> modelim = new DefaultListModel<>();
+                    while(rs.next())
+                    {
+                        model.addElement(rs.getString("TRALOI"));
+                        modelim.addElement(rs.getString("HINHANH"));
+                    }
+                    for(int i=0; i<model.getSize(); i++){
+                        if(listQuestion.getSelectedIndex()==i){
+                            Answers.setText(model.get(i));
+                            this.HinhAnh(modelim.get(i));
+                        }
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(cbxFind.getSelectedIndex()==3)
+            {
+                cbxFirst.setVisible(false);
+                String s = "SELECT * FROM THONGTIN_QUYCHE";
+                try {
+                    stmt = connect.prepareStatement(s);
+                    rs = stmt.executeQuery();
+                    DefaultListModel<String> model = new DefaultListModel<>();
+                    DefaultListModel<String> modelim = new DefaultListModel<>();
+                    while(rs.next())
+                    {
+                        model.addElement(rs.getString("TRALOI"));
+                        modelim.addElement(rs.getString("HINHANH"));
+                    }
+                    for(int i=0; i<model.getSize(); i++){
+                        if(listQuestion.getSelectedIndex()==i){
+                            Answers.setText(model.get(i));
+                            this.HinhAnh(modelim.get(i));
+                        }
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
-        
+        if(rbKey.isSelected()){
+            for(int i=0; i<listModel.getSize(); i++){
+                if(listQuestion.getSelectedIndex()==i){
+                    Answers.setText(listModelAns.get(i));
+                    this.HinhAnh(listModelIma.get(i));
+                }
+            }
+        }
     }//GEN-LAST:event_SearchActionPerformed
 
+    private void rbKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbKeyActionPerformed
+        // TODO add your handling code here:
+        //JOptionPane.showMessageDialog(null, "Nhập từ khóa được chọn!");
+        txtFKey.setVisible(true);
+        cbxFind.setVisible(false);
+        cbxFirst.setVisible(false);
+        Answers.setText("");
+        this.HinhAnh(null);
+        DefaultListModel<String> model = new DefaultListModel<>();
+        model.addElement("");
+        listQuestion.setModel(model);
+    }//GEN-LAST:event_rbKeyActionPerformed
+
+    private void radioCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioCategoryActionPerformed
+        // TODO add your handling code here:
+        txtFKey.setVisible(false);
+        cbxFind.setVisible(true);
+        cbxFind.setSelectedIndex(0);
+        Answers.setText("");
+        this.HinhAnh(null);
+        DefaultListModel<String> model = new DefaultListModel<>();
+        model.addElement("");
+        listQuestion.setModel(model);
+    }//GEN-LAST:event_radioCategoryActionPerformed
+    
+    private void txtFKeyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtFKeyMouseClicked
+        // TODO add your handling code here:
+        txtFKey.setText("");
+        try {
+            // TODO add your handling code here:
+            String s = "SELECT * FROM MON_HOC";
+            DefaultListModel<String> model = new DefaultListModel<>();
+            stmt = connect.prepareStatement(s);
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                model.addElement(rs.getString("CAUHOI"));
+            }
+            listQuestion.setModel(model);
+            s = "SELECT * FROM GIANG_VIEN";
+            stmt = connect.prepareStatement(s);
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                model.addElement(rs.getString("CAUHOI"));
+            }
+            listQuestion.setModel(model);
+            s = "SELECT * FROM THONGTIN_QUYCHE";
+            stmt = connect.prepareStatement(s);
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                model.addElement(rs.getString("CAUHOI"));
+            }
+            listQuestion.setModel(model);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_txtFKeyMouseClicked
+    
+    private void txtFKeyKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFKeyKeyPressed
+        try {
+            String s = "SELECT * FROM MON_HOC";
+            DefaultListModel<String> model = new DefaultListModel<>();
+            DefaultListModel<String> modelAns = new DefaultListModel<>();
+            DefaultListModel<String> modelIma = new DefaultListModel<>();
+            listModelAns = new DefaultListModel<>();
+            listModelIma = new DefaultListModel<>();
+            listModel = new DefaultListModel<>();
+            stmt = connect.prepareStatement(s);
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                model.addElement(rs.getString("CAUHOI"));
+                modelAns.addElement(rs.getString("TRALOI"));
+                modelIma.addElement(rs.getString("HINHANH"));
+            }
+            s = "SELECT * FROM GIANG_VIEN";
+            stmt = connect.prepareStatement(s);
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                model.addElement(rs.getString("CAUHOI"));
+                modelAns.addElement(rs.getString("TRALOI"));
+                modelIma.addElement(rs.getString("HINHANH"));
+            }
+            s = "SELECT * FROM THONGTIN_QUYCHE";
+            stmt = connect.prepareStatement(s);
+            rs = stmt.executeQuery();
+            while(rs.next())
+            {
+                model.addElement(rs.getString("CAUHOI"));
+                modelAns.addElement(rs.getString("TRALOI"));
+                modelIma.addElement(rs.getString("HINHANH"));
+            }
+            for(int i=0; i<model.getSize(); i++){
+                if(model.get(i).toUpperCase().indexOf(txtFKey.getText().toUpperCase())!=-1){
+                    listModel.addElement(model.get(i));
+                    listModelAns.addElement(modelAns.get(i));
+                    listModelIma.addElement(modelIma.get(i));
+                }
+            }
+            listQuestion.setModel(listModel);
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(GUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_txtFKeyKeyPressed
+
+    private void txtFKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFKeyKeyReleased
+        // TODO add your handling code here:
+        txtFKeyKeyPressed(evt);
+    }//GEN-LAST:event_txtFKeyKeyReleased
+    
     /**
      * @param args the command line arguments
      */
@@ -322,13 +572,15 @@ public class GUIFrame extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cbxFind;
     private javax.swing.JComboBox<String> cbxFirst;
-    private javax.swing.JComboBox<String> cbxSecond;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lbImage;
     private javax.swing.JList<String> listQuestion;
     private javax.swing.JRadioButton radioCategory;
+    private javax.swing.JRadioButton rbKey;
+    private javax.swing.JTextField txtFKey;
     // End of variables declaration//GEN-END:variables
 }
